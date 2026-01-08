@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link type="text/css" rel="stylesheet" href="style.css"/>
+  </head>
+  <body>
+    <!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Magia para ti ✨</title>
+<style>
+  body {
+    margin: 0;
+    background: #0b0f1a;
+    overflow: hidden;
+  }
+  canvas { display: block; }
+
+  .controls {
+    position: fixed;
+    bottom: 15px;
+    width: 100%;
+    text-align: center;
+  }
+
+  button, input {
+    background: #1f2a44;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    margin: 4px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<audio id="music" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<div class="controls">
+  <button onclick="setShape('star')">⭐</button>
+  <button onclick="setShape('heart')">❤️</button>
+  <button onclick="setShape('saturn')">🪐</button>
+  <button onclick="setShape('infinity')">♾</button>
+  <button onclick="setShape('moon')">🌙</button>
+  <input type="color" onchange="color=this.value">
+  <button onclick="toggleMusic()">🎶</button>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+
+const particles = [];
+const total = 1000;
+let shape = "star";
+let color = "#ffffff";
+let time = 0;
+let playing = false;
+
+class Particle {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
+    this.tx = this.x;
+    this.ty = this.y;
+  }
+  update() {
+    this.x += (this.tx - this.x) * 0.06;
+    this.y += (this.ty - this.y) * 0.06;
+    ctx.fillRect(this.x, this.y, 2, 2);
+  }
+}
+
+function setShape(s) {
+  shape = s;
+}
+
+function toggleMusic() {
+  const music = document.getElementById("music");
+  playing ? music.pause() : music.play();
+  playing = !playing;
+}
+
+function updateTargets() {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  particles.forEach((p, i) => {
+    let t = i / particles.length * Math.PI * 2;
+
+    if (shape === "heart") {
+      let pulse = 14 + Math.sin(time * 2) * 2;
+      let x = 16 * Math.pow(Math.sin(t), 3);
+      let y = -(13 * Math.cos(t) - 5 * Math.cos(2*t)
+              - 2 * Math.cos(3*t) - Math.cos(4*t));
+      p.tx = cx + x * pulse;
+      p.ty = cy + y * pulse;
+    }
+
+    if (shape === "saturn") {
+      let a = t + time * 0.6;
+      p.tx = cx + Math.cos(a) * 120;
+      p.ty = cy + Math.sin(a) * 120;
+      if (i % 3 === 0) {
+        p.tx = cx + Math.cos(a) * 200;
+        p.ty = cy + Math.sin(a) * 60;
+      }
+    }
+
+    if (shape === "infinity") {
+      let x = Math.sin(t) * 150;
+      let y = Math.sin(t * 2) * 70;
+      p.tx = cx + x;
+      p.ty = cy + y;
+    }
+
+    if (shape === "moon") {
+      let r = 140;
+      p.tx = cx + Math.cos(t) * r;
+      p.ty = cy + Math.sin(t) * r;
+      if (i % 4 === 0) {
+        p.tx -= 40;
+      }
+    }
+
+    if (shape === "star") {
+      p.tx += Math.sin(time + i) * 0.4;
+      p.ty += Math.cos(time + i) * 0.4;
+    }
+  });
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = color;
+  time += 0.04;
+  updateTargets();
+  particles.forEach(p => p.update());
+  requestAnimationFrame(animate);
+}
+
+for (let i = 0; i < total; i++) particles.push(new Particle());
+animate();
+
+window.onresize = () => {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+};
+</script>
+
+</body>
+</html>
+
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
